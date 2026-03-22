@@ -6,6 +6,11 @@
         private decimal bilans;
         private bool zablokowane = false;
 
+        public Konto()
+        {
+
+        }
+
         public Konto(string klient, decimal bilansNaStart = 0)
         {
             this.klient = klient;
@@ -17,7 +22,7 @@
             get { return klient; }
         }
 
-        public decimal Bilans
+        public virtual decimal Bilans
         {
             get { return bilans; }
         }
@@ -27,7 +32,7 @@
             get { return zablokowane; }
         }
 
-        public void Wplata(decimal kwota)
+        public virtual void Wplata(decimal kwota)
         {
             if (zablokowane == true)
             {
@@ -35,14 +40,9 @@
             }
             else
             {
-                if (kwota < 0)
+                if (kwota <= 0)
                 {
-                    throw new ArgumentException("Kwota wpłaty musi być dodatnia.");
-                }
-                else if (kwota == 0)
-                {
-                    throw new ArgumentException("Kwota wpłaty nie może być zerowa.");
-
+                    throw new ArgumentException("Kwota musi być dodatnia.");
                 }
                 else if (kwota > 0)
                 {
@@ -51,23 +51,18 @@
             }
         }
 
-        public void Wyplata(decimal kwota)
+        public virtual void Wyplata(decimal kwota)
         {
-            if (zablokowane == true)
+            if (zablokowane)
             {
-                throw new InvalidOperationException("Nie można dokonać wypłaty na zablokowane konto.");
+                throw new InvalidOperationException("Nie można wypłacić z zablokowanego konta.");
             }
             else
             {
-                if (kwota < 0)
+                if (kwota <= 0)
                 {
-                    throw new ArgumentException("Kwota wypłaty musi być dodatnia.");
-                }
-                else if (kwota == 0)
-                {
-                    throw new ArgumentException("Kwota wypłaty nie może być zerowa.");
-
-                }
+                    throw new ArgumentException("Kwota musi być dodatnia.");
+                }    
                 else if (kwota > bilans)
                 {
                     throw new InvalidOperationException("Nie można wypłacić więcej niż aktualny bilans.");
@@ -87,6 +82,11 @@
         public void OdblokujKonto()
         {
             zablokowane = false;
+        }
+
+        protected void ZmienBilans(decimal kwota)
+        {
+            bilans += kwota;
         }
 
     }
